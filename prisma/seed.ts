@@ -50,6 +50,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 
   return debouncedValue;
 }`,
+        isPinned: true,
       },
       {
         title: 'useLocalStorage Hook',
@@ -232,6 +233,7 @@ npm run build
 pm2 restart all
 
 echo "Deployment complete!"`,
+        isPinned: true,
       },
       {
         title: 'Docker Documentation',
@@ -260,6 +262,7 @@ git reset --hard HEAD~1
 
 # Undo the last N commits and keep changes
 git reset --soft HEAD~N`,
+        isPinned: true,
       },
       {
         title: 'Docker Cleanup',
@@ -418,6 +421,7 @@ async function main() {
           language: 'language' in itemData ? itemData.language : null,
           userId: demoUser.id,
           itemTypeId: itemTypeMap[itemData.type],
+          isPinned: itemData.isPinned ?? false,
         },
       });
 
