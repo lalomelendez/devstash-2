@@ -1,15 +1,9 @@
-"use client";
-
 import { Clock } from "lucide-react";
 import ItemCard from "./item-card";
-import { mockItems } from "@/lib/mock-data";
+import { getRecentItems } from "@/lib/db/items";
 
-export default function RecentItems() {
-  // Get 10 most recent items sorted by updatedAt, excluding pinned items
-  const recentItems = [...mockItems]
-    .filter((item) => !item.isPinned)
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-    .slice(0, 10);
+export default async function RecentItems() {
+  const recentItems = await getRecentItems(10);
 
   if (recentItems.length === 0) {
     return null;

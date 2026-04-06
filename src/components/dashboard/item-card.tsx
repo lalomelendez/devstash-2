@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,9 +11,8 @@ import {
   Star,
   Pin,
 } from "lucide-react";
-import { mockItemTypes } from "@/lib/mock-data";
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   Code,
   Sparkles,
   Terminal,
@@ -25,26 +22,22 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Link: LinkIcon,
 };
 
-interface Item {
-  id: string;
-  title: string;
-  description: string;
-  isFavorite: boolean;
-  isPinned: boolean;
-  itemTypeId: string;
-  tags: string[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 interface ItemCardProps {
-  item: Item;
+  item: {
+    id: string;
+    title: string;
+    description: string | null;
+    isFavorite: boolean;
+    isPinned: boolean;
+    itemType: { name: string; icon: string; color: string };
+    tags: { name: string }[];
+    updatedAt: Date;
+  };
 }
 
 export default function ItemCard({ item }: ItemCardProps) {
-  const itemType = mockItemTypes.find((t) => t.id === item.itemTypeId);
-  const IconComponent = itemType ? iconMap[itemType.icon] : Code;
-  const iconColor = itemType?.color || "#3b82f6";
+  const IconComponent = iconMap[item.itemType.icon] ?? Code;
+  const iconColor = item.itemType.color || "#3b82f6";
 
   const formatDate = (date: Date) => {
     const now = new Date();
@@ -87,11 +80,11 @@ export default function ItemCard({ item }: ItemCardProps) {
             <div className="mt-2 flex flex-wrap gap-1">
               {item.tags.slice(0, 3).map((tag) => (
                 <Badge
-                  key={tag}
+                  key={tag.name}
                   variant="secondary"
                   className="text-xs bg-muted text-muted-foreground"
                 >
-                  {tag}
+                  {tag.name}
                 </Badge>
               ))}
             </div>
