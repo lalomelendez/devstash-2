@@ -1,14 +1,9 @@
-"use client";
-
 import Link from "next/link";
 import CollectionCard from "./collection-card";
-import { mockCollections } from "@/lib/mock-data";
+import { getCollectionsForDashboard } from "@/lib/db/collections";
 
-export default function CollectionsSection() {
-  // Show up to 6 recent collections sorted by updatedAt
-  const recentCollections = [...mockCollections]
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-    .slice(0, 6);
+export default async function CollectionsSection() {
+  const collections = await getCollectionsForDashboard();
 
   return (
     <section>
@@ -22,7 +17,7 @@ export default function CollectionsSection() {
         </Link>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {recentCollections.map((collection) => (
+        {collections.map((collection) => (
           <CollectionCard key={collection.id} collection={collection} />
         ))}
       </div>

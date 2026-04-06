@@ -1,24 +1,33 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, Code, FileText, Terminal, MoreHorizontal } from "lucide-react";
+import { Star, MoreHorizontal, Code, Sparkles, Terminal, StickyNote, File, Image, Link } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { CollectionWithStats } from "@/lib/db/collections";
 
-interface Collection {
-  id: string;
-  name: string;
-  description: string;
-  isFavorite: boolean;
-  itemCount: number;
-}
+const TYPE_ICONS = {
+  snippet: Code,
+  prompt: Sparkles,
+  command: Terminal,
+  note: StickyNote,
+  file: File,
+  image: Image,
+  link: Link,
+};
 
 interface CollectionCardProps {
-  collection: Collection;
+  collection: CollectionWithStats;
 }
 
 export default function CollectionCard({ collection }: CollectionCardProps) {
+  const { dominantType, typeCounts } = collection;
+
   return (
-    <Card className="group relative bg-card border-border hover:border-muted-foreground/50 transition-colors">
+    <Card
+      className="group relative bg-card border-border hover:border-muted-foreground/50 transition-colors"
+      style={{
+        borderLeftWidth: dominantType ? '4px' : '1px',
+        borderLeftColor: dominantType?.color ?? undefined,
+      }}
+    >
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -36,15 +45,22 @@ export default function CollectionCard({ collection }: CollectionCardProps) {
           </Button>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          {collection.itemCount} items
+          {collection._count.items} items
         </p>
         <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
           {collection.description}
         </p>
-        <div className="mt-3 flex items-center gap-2 text-muted-foreground">
-          <Code className="h-4 w-4 text-blue-500" />
-          <FileText className="h-4 w-4 text-yellow-500" />
-          <Terminal className="h-4 w-4 text-orange-500" />
+        <div className="mt-3 flex items-center gap-2">
+          {typeCounts.slice(0, 4).map((type) => {
+            const Icon = TYPE_ICONS[type.name as keyof typeof TYPE_ICONS] ?? Code;
+            return (
+              <Icon
+                key={type.name}
+                className="h-4 w-4"
+                style={{ color: type.color }}
+              />
+            );
+          })}
         </div>
       </CardContent>
     </Card>
