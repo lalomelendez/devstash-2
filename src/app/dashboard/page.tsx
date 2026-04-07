@@ -3,10 +3,13 @@ import StatsCards from "@/components/dashboard/stats-cards";
 import CollectionsSection from "@/components/dashboard/collections-section";
 import PinnedItems from "@/components/dashboard/pinned-items";
 import RecentItems from "@/components/dashboard/recent-items";
+import { getSidebarData } from "@/lib/db/stats";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const sidebarData = await getSidebarData();
+
   return (
-    <DashboardLayout>
+    <DashboardLayout sidebarData={sidebarData}>
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <div>

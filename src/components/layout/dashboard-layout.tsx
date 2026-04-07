@@ -5,11 +5,44 @@ import TopBar from "@/components/layout/top-bar";
 import Sidebar from "@/components/layout/sidebar";
 import MobileSidebar from "@/components/layout/mobile-sidebar";
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
+interface SidebarData {
+  user: { name: string | null; email: string | null } | null;
+  itemTypes: {
+    id: string;
+    name: string;
+    icon: string;
+    color: string;
+    _count: { items: number };
+  }[];
+  favoriteCollections: {
+    id: string;
+    name: string;
+    isFavorite: boolean;
+    itemCount: number;
+    dominantType: { name: string; color: string } | null;
+  }[];
+  recentCollections: {
+    id: string;
+    name: string;
+    isFavorite: boolean;
+    itemCount: number;
+    dominantType: { name: string; color: string } | null;
+  }[];
+  allCollections: {
+    id: string;
+    name: string;
+    isFavorite: boolean;
+    itemCount: number;
+    dominantType: { name: string; color: string } | null;
+  }[];
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+  sidebarData: SidebarData;
+}
+
+export default function DashboardLayout({ children, sidebarData }: DashboardLayoutProps) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -22,6 +55,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <Sidebar
             isCollapsed={isSidebarCollapsed}
             onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            {...sidebarData}
           />
         </div>
 

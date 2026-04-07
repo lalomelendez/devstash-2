@@ -10,23 +10,13 @@ import {
   File,
   Image,
   Link as LinkIcon,
-  Star,
-  ChevronDown,
-  ChevronRight,
   Settings,
   PanelLeftClose,
   PanelLeft,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import {
-  mockItemTypes,
-  mockCollections,
-  mockItemTypeCounts,
-  mockUser,
-} from "@/lib/mock-data";
 
 const ICON_MAP = {
   Code,
@@ -38,18 +28,42 @@ const ICON_MAP = {
   Link: LinkIcon,
 };
 
+interface CollectionItem {
+  id: string;
+  name: string;
+  isFavorite: boolean;
+  itemCount: number;
+  dominantType: { name: string; color: string } | null;
+}
+
 interface SidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
+  user: { name: string | null; email: string | null } | null;
+  itemTypes: {
+    id: string;
+    name: string;
+    icon: string;
+    color: string;
+    _count: { items: number };
+  }[];
+  favoriteCollections: CollectionItem[];
+  recentCollections: CollectionItem[];
+  allCollections: CollectionItem[];
 }
 
-export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
-  const [collectionsExpanded, setCollectionsExpanded] = useState(true);
-
-  const favoriteCollections = mockCollections.filter((c) => c.isFavorite);
-  const recentCollections = mockCollections
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-    .slice(0, 3);
+export default function Sidebar({
+  isCollapsed,
+  onToggle,
+  user,
+  itemTypes,
+  favoriteCollections,
+  recentCollections,
+  allCollections,
+}: SidebarProps) {
+  const [favoritesExpanded, setFavoritesExpanded] = useState(true);
+  const [recentExpanded, setRecentExpanded] = useState(true);
+  const [allExpanded, setAllExpanded] = useState(true);
 
   return (
     <aside
@@ -88,11 +102,8 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
               Types
             </h3>
           )}
-          {mockItemTypes.map((type) => {
-            const Icon = ICON_MAP[type.icon as keyof typeof ICON_MAP];
-            const count = mockItemTypeCounts[
-              type.name as keyof typeof mockItemTypeCounts
-            ] || 0;
+          {itemTypes.map((type) => {
+            const Icon = ICON_MAP[type.icon as keyof typeof ICON_MAP] ?? Code;
 
             return (
               <Link
@@ -109,7 +120,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                   <>
                     <span className="flex-1 capitalize">{type.name}s</span>
                     <span className="text-xs text-muted-foreground">
-                      {count}
+                      {type._count.items}
                     </span>
                   </>
                 )}
@@ -120,68 +131,110 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
 
         {/* Collections Section */}
         {!isCollapsed && (
-          <>
-            <Separator className="my-4" />
+          <div className="space-y-1">
+            <h3 className="mb-2 px-2 pt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Collections
+            </h3>
+
+            {/* Favorites */}
             <div className="space-y-1">
               <button
-                onClick={() => setCollectionsExpanded(!collectionsExpanded)}
-                className="flex w-full items-center gap-2 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground"
+                onClick={() => setFavoritesExpanded(!favoritesExpanded)}
+                className="flex w-full items-center gap-2 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
               >
-                {collectionsExpanded ? (
-                  <ChevronDown className="h-3 w-3" />
+                {favoritesExpanded ? (
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 ) : (
-                  <ChevronRight className="h-3 w-3" />
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 )}
-                Collections
+                Favorites
               </button>
-
-              {collectionsExpanded && (
-                <div className="mt-2 space-y-1">
-                  {/* Favorites */}
-                  {favoriteCollections.length > 0 && (
-                    <>
-                      <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                        Favorites
-                      </div>
-                      {favoriteCollections.map((collection) => (
-                        <Link
-                          key={collection.id}
-                          href={`/collections/${collection.id}`}
-                          className="flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent"
-                        >
-                          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                          <span className="flex-1 truncate">
-                            {collection.name}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {collection.itemCount}
-                          </span>
-                        </Link>
-                      ))}
-                    </>
-                  )}
-
-                  {/* Recent */}
-                  <div className="mt-3 px-2 py-1 text-xs font-medium text-muted-foreground">
-                    Recent
-                  </div>
-                  {recentCollections.map((collection) => (
-                    <Link
-                      key={collection.id}
-                      href={`/collections/${collection.id}`}
-                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent"
-                    >
-                      <div className="h-4 w-4" />
-                      <span className="flex-1 truncate">{collection.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {collection.itemCount}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              )}
+              {favoritesExpanded && favoriteCollections.map((collection) => (
+                <Link
+                  key={collection.id}
+                  href={`/collections/${collection.id}`}
+                  className="flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent"
+                >
+                  <div
+                    className="h-4 w-4 rounded-full"
+                    style={{ backgroundColor: collection.dominantType?.color ?? '#6b7280' }}
+                  />
+                  <span className="flex-1 truncate">{collection.name}</span>
+                  <span className="text-xs text-muted-foreground">{collection.itemCount}</span>
+                </Link>
+              ))}
             </div>
-          </>
+
+            {/* Recent */}
+            <div className="space-y-1">
+              <button
+                onClick={() => setRecentExpanded(!recentExpanded)}
+                className="flex w-full items-center gap-2 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+              >
+                {recentExpanded ? (
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                ) : (
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
+                Recent
+              </button>
+              {recentExpanded && recentCollections.map((collection) => (
+                <Link
+                  key={collection.id}
+                  href={`/collections/${collection.id}`}
+                  className="flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent"
+                >
+                  <div
+                    className="h-4 w-4 rounded-full"
+                    style={{ backgroundColor: collection.dominantType?.color ?? '#6b7280' }}
+                  />
+                  <span className="flex-1 truncate">{collection.name}</span>
+                  <span className="text-xs text-muted-foreground">{collection.itemCount}</span>
+                </Link>
+              ))}
+            </div>
+
+            {/* All Collections */}
+            <div className="space-y-1">
+              <button
+                onClick={() => setAllExpanded(!allExpanded)}
+                className="flex w-full items-center gap-2 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+              >
+                {allExpanded ? (
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                ) : (
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
+                All Collections
+              </button>
+              {allExpanded && allCollections.map((collection) => (
+                <Link
+                  key={collection.id}
+                  href={`/collections/${collection.id}`}
+                  className="flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent"
+                >
+                  <div
+                    className="h-4 w-4 rounded-full"
+                    style={{ backgroundColor: collection.dominantType?.color ?? '#6b7280' }}
+                  />
+                  <span className="flex-1 truncate">{collection.name}</span>
+                  <span className="text-xs text-muted-foreground">{collection.itemCount}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
@@ -191,10 +244,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           <div className="flex justify-center">
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-primary text-xs text-primary-foreground">
-                {mockUser.name
-                  ?.split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+                {user?.name?.split(" ").map((n) => n[0]).join("") ?? "DU"}
               </AvatarFallback>
             </Avatar>
           </div>
@@ -202,17 +252,12 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-primary text-xs text-primary-foreground">
-                {mockUser.name
-                  ?.split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+                {user?.name?.split(" ").map((n) => n[0]).join("") ?? "DU"}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium">{mockUser.name}</p>
-              <p className="truncate text-xs text-muted-foreground">
-                {mockUser.email}
-              </p>
+              <p className="truncate text-sm font-medium">{user?.name ?? "Demo User"}</p>
+              <p className="truncate text-xs text-muted-foreground">{user?.email ?? "demo@devstash.io"}</p>
             </div>
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <Settings className="h-4 w-4" />
