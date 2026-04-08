@@ -19,6 +19,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -83,6 +84,11 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   >
                     <Icon className="h-4 w-4" style={{ color: type.color }} />
                     <span className="flex-1 capitalize">{type.name}s</span>
+                    {(type.name === "file" || type.name === "image") && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-semibold">
+                        PRO
+                      </Badge>
+                    )}
                     <span className="text-xs text-muted-foreground">
                       {count}
                     </span>
