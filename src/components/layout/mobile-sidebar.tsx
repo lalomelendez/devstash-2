@@ -2,13 +2,6 @@
 
 import Link from "next/link";
 import {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File,
-  Image,
-  Link as LinkIcon,
   Star,
   Settings,
 } from "lucide-react";
@@ -22,33 +15,48 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  mockItemTypes,
-  mockCollections,
-  mockItemTypeCounts,
-  mockUser,
-} from "@/lib/mock-data";
+import { ICON_MAP } from "@/lib/constants/icons";
 
-const ICON_MAP = {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File,
-  Image,
-  Link: LinkIcon,
-};
+interface SidebarData {
+  user: { name: string | null; email: string | null } | null;
+  itemTypes: {
+    id: string;
+    name: string;
+    icon: string;
+    color: string;
+    _count: { items: number };
+  }[];
+  favoriteCollections: {
+    id: string;
+    name: string;
+    isFavorite: boolean;
+    itemCount: number;
+    dominantType: { name: string; color: string } | null;
+  }[];
+  recentCollections: {
+    id: string;
+    name: string;
+    isFavorite: boolean;
+    itemCount: number;
+    dominantType: { name: string; color: string } | null;
+  }[];
+  allCollections: {
+    id: string;
+    name: string;
+    isFavorite: boolean;
+    itemCount: number;
+    dominantType: { name: string; color: string } | null;
+  }[];
+}
 
 interface MobileSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  sidebarData: SidebarData;
 }
 
-export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
-  const favoriteCollections = mockCollections.filter((c) => c.isFavorite);
-  const recentCollections = mockCollections
-    .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-    .slice(0, 3);
+export default function MobileSidebar({ isOpen, onClose, sidebarData }: MobileSidebarProps) {
+  const { itemTypes, favoriteCollections, recentCollections, user } = sidebarData;
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -68,12 +76,9 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               <h3 className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Types
               </h3>
-              {mockItemTypes.map((type) => {
-                const Icon = ICON_MAP[type.icon as keyof typeof ICON_MAP];
-                const count =
-                  mockItemTypeCounts[
-                    type.name as keyof typeof mockItemTypeCounts
-                  ] || 0;
+              {itemTypes.map((type) => {
+                const Icon = ICON_MAP[type.icon as keyof typeof ICON_MAP] ?? ICON_MAP.Link;
+                const count = type._count.items;
 
                 return (
                   <Link
@@ -117,7 +122,10 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                       onClick={onClose}
                       className="flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent"
                     >
-                      <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                      <div
+                        className="h-4 w-4 rounded-full"
+                        style={{ backgroundColor: collection.dominantType?.color ?? '#6b7280' }}
+                      />
                       <span className="flex-1 truncate">{collection.name}</span>
                       <span className="text-xs text-muted-foreground">
                         {collection.itemCount}
@@ -138,7 +146,10 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   onClick={onClose}
                   className="flex items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent"
                 >
-                  <div className="h-4 w-4" />
+                  <div
+                    className="h-4 w-4 rounded-full"
+                    style={{ backgroundColor: collection.dominantType?.color ?? '#6b7280' }}
+                  />
                   <span className="flex-1 truncate">{collection.name}</span>
                   <span className="text-xs text-muted-foreground">
                     {collection.itemCount}
@@ -153,16 +164,16 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
             <div className="flex items-center gap-3">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary text-xs text-primary-foreground">
-                  {mockUser.name
+                  {user?.name
                     ?.split(" ")
                     .map((n) => n[0])
-                    .join("")}
+                    .join("") ?? "DU"}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 overflow-hidden">
-                <p className="truncate text-sm font-medium">{mockUser.name}</p>
+                <p className="truncate text-sm font-medium">{user?.name ?? "Demo User"}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {mockUser.email}
+                  {user?.email ?? "demo@devstash.io"}
                 </p>
               </div>
               <Button variant="ghost" size="icon" className="h-8 w-8">

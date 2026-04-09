@@ -3,13 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File,
-  Image,
-  Link as LinkIcon,
   Settings,
   PanelLeftClose,
   PanelLeft,
@@ -18,16 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const ICON_MAP = {
-  Code,
-  Sparkles,
-  Terminal,
-  StickyNote,
-  File,
-  Image,
-  Link: LinkIcon,
-};
+import { ICON_MAP } from "@/lib/constants/icons";
 
 interface CollectionItem {
   id: string;
@@ -104,7 +88,7 @@ export default function Sidebar({
             </h3>
           )}
           {itemTypes.map((type) => {
-            const Icon = ICON_MAP[type.icon as keyof typeof ICON_MAP] ?? Code;
+            const Icon = ICON_MAP[type.icon as keyof typeof ICON_MAP] ?? ICON_MAP.Code;
 
             return (
               <Link

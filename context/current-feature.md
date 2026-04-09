@@ -3,36 +3,75 @@
 
 ## Current Feature
 
-# Add Pro Badge to Sidebar
+# Quick Fixes - Code Quality Improvements
 
 ## Overview
 
-Add a pro badge to the files and images type in the sidebar
+Fix 5 low-risk code quality issues identified during codebase review.
 
 ## Requirements
 
-- Use ShadCN UI badge component
-- Make badge clean and subtle
-- Make PRO all uppercase
+1. **Remove `console.warn`** in `src/lib/db/collections.ts` line 34
+2. **Add `url = env("DATABASE_URL")`** to Prisma datasource in `prisma/schema.prisma`
+3. **Add `@@index([userId, isPinned])`** to items model in Prisma schema
+4. **Extract `ICON_MAP`** to shared file `src/lib/constants/icons.ts`
+5. **Fix MobileSidebar** to use real database data instead of mock data
 
 ## Status
 
-Complete
+- [ ] Fix console.warn
+- [ ] Add Prisma datasource url
+- [ ] Add isPinned index migration
+- [ ] Extract ICON_MAP to shared constants
+- [ ] Fix MobileSidebar to use sidebarData prop
 
 ## Goals
 
-- Add PRO badge next to "Files" item type in sidebar
-- Add PRO badge next to "Images" item type in sidebar
-- Badge should use ShadCN UI badge component
-- Badge should be subtle and clean
-- "PRO" text should be all uppercase
+- Improve code quality with minimal risk
+- Ensure mobile and desktop sidebars show consistent data
+- Prepare database schema for better query performance
 
 ## Notes
 
-- Files and Images are Pro-only features according to project-overview.md
-- The badge should be positioned next to the type name in the sidebar
+- These are low-risk, high-impact fixes
+- No auth integration required
+- Index migration requires `npx prisma migrate dev`
 
+## Todo
 
+### 1. Remove console.warn
+- File: `src/lib/db/collections.ts`
+- Remove or replace `console.warn('Demo user not found')` with silent return
+
+### 2. Add Prisma datasource url
+- File: `prisma/schema.prisma`
+- Add `url = env("DATABASE_URL")` to datasource block
+
+### 3. Add isPinned index (Migration Required)
+- File: `prisma/schema.prisma`
+- Add `@@index([userId, isPinned])` to Item model
+- **Development**: Run `npx prisma migrate dev --name add_isPinned_index`
+- **Production**: Run `npx prisma migrate deploy` after merging
+
+### Database Migration Workflow
+Since this feature includes a schema change, follow the migration workflow:
+1. Schema changes must NEVER use `prisma db push` - always use migrations
+2. **Development**: `npx prisma migrate dev --name <migration_name>` creates migration files locally
+3. **Production**: `npx prisma migrate deploy` applies pending migrations before app starts
+4. Verify migration status with `npx prisma migrate status` before committing
+5. Migration files must be committed to git and applied in order across environments
+
+### 4. Extract ICON_MAP to shared constants
+- File: `src/lib/constants/icons.ts` (new)
+- Move `ICON_MAP` from `sidebar.tsx` and `mobile-sidebar.tsx` to shared file
+- Export and import in both components
+
+### 5. Fix MobileSidebar to use sidebarData
+- File: `src/components/layout/mobile-sidebar.tsx`
+- Add `SidebarData` interface (already exists in dashboard-layout.tsx)
+- Accept `sidebarData` prop instead of importing mock data
+- File: `src/components/layout/dashboard-layout.tsx`
+- Pass `sidebarData` to `MobileSidebar` component
 
 ## History
 - **Initial Setup** - Next.js 16, Tailwind CSS v4, TypeScript configured (Completed)
@@ -45,3 +84,4 @@ Complete
 - **Dashboard Items (DB)** - Replaced mock data with real Prisma data. Created `src/lib/db/items.ts` with `getPinnedItems()` and `getRecentItems()`. ItemCard now uses itemType relation directly instead of mock lookup. Pinned and Recent sections now fetch from database. (Completed)
 - ****EXTRA** - Updated seed data to add `isPinned: true` to 3 items (useDebounce Hook, Deploy Script, Git Reset HEAD~1) so pinned section displays on dashboard. (Completed)
 - **Stats & Sidebar (DB)** - Created `src/lib/db/stats.ts` with `getStats()` and `getSidebarData()`. StatsCards now shows actual DB counts. Sidebar now displays item types from DB with counts, favorite/recent/all collections with dominant type colored circles. Each collection sub-section (Favorites, Recent, All Collections) is independently collapsible. Dashboard page fetches sidebar data server-side and passes to client components. (Completed)
+- Added a pro badge to the files and images type in the sidebar

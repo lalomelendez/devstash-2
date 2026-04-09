@@ -31,7 +31,6 @@ export async function getCollectionsForDashboard(): Promise<CollectionWithStats[
   });
 
   if (!demoUser) {
-    console.warn('Demo user not found');
     return [];
   }
 

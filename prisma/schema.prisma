@@ -116,6 +116,9 @@ model Item {
   @@index([userId])
   @@index([itemTypeId])
   @@index([createdAt])
+  @@index([userId, isPinned])
+  @@index([userId, isFavorite])
+  @@index([updatedAt])
   @@map("items")
 }
 

@@ -63,6 +63,7 @@ export default function DashboardLayout({ children, sidebarData }: DashboardLayo
         <MobileSidebar
           isOpen={isMobileSidebarOpen}
           onClose={() => setIsMobileSidebarOpen(false)}
+          sidebarData={sidebarData}
         />
 
         {/* Main Content */}
