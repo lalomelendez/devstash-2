@@ -19,11 +19,7 @@ Fix 5 low-risk code quality issues identified during codebase review.
 
 ## Status
 
-- [ ] Fix console.warn
-- [ ] Add Prisma datasource url
-- [ ] Add isPinned index migration
-- [ ] Extract ICON_MAP to shared constants
-- [ ] Fix MobileSidebar to use sidebarData prop
+Complete
 
 ## Goals
 
@@ -85,3 +81,4 @@ Since this feature includes a schema change, follow the migration workflow:
 - ****EXTRA** - Updated seed data to add `isPinned: true` to 3 items (useDebounce Hook, Deploy Script, Git Reset HEAD~1) so pinned section displays on dashboard. (Completed)
 - **Stats & Sidebar (DB)** - Created `src/lib/db/stats.ts` with `getStats()` and `getSidebarData()`. StatsCards now shows actual DB counts. Sidebar now displays item types from DB with counts, favorite/recent/all collections with dominant type colored circles. Each collection sub-section (Favorites, Recent, All Collections) is independently collapsible. Dashboard page fetches sidebar data server-side and passes to client components. (Completed)
 - Added a pro badge to the files and images type in the sidebar
+- **Quick Fixes - Code Quality Improvements** - Removed console.warn, added DB indexes for isPinned/isFavorite/updatedAt, extracted ICON_MAP to shared constants, fixed MobileSidebar to use sidebarData prop, added Suspense boundaries with skeleton loading states. (Completed)
