@@ -17,3 +17,15 @@ Read the following to get the full context of the project:
 - **Build**: `npm run build`
 - **Production server**: `npm run start`
 - **Lint**: `npm run lint`
+
+## Neon MCP Tools
+
+When using any `mcp__neon__*` tools (run_sql, run_sql_transaction, list_projects, describe_project, etc.):
+
+- **Project name**: `devstash-traversy-` (project ID: `withered-waterfall-91301963`)
+- **Development branch**: `br-patient-sea-an9sxrpv` (slug: `br-patient-sea-an9sxrpv`)
+- **NEVER use production branch** (`br-rapid-tree-anvxbkby`) unless I explicitly ask
+
+Always pass these values:
+- `projectId`: `withered-waterfall-91301963`
+- `branchId`: `br-patient-sea-an9sxrpv` (for all queries against the dev database)
