@@ -1,73 +1,52 @@
-# where wi will load new features
-
-
-## Current Feature
-
-# Quick Fixes - Code Quality Improvements
+# Current Feature
 
 ## Overview
 
-Fix 5 low-risk code quality issues identified during codebase review.
-
-## Requirements
-
-1. **Remove `console.warn`** in `src/lib/db/collections.ts` line 34
-2. **Add `url = env("DATABASE_URL")`** to Prisma datasource in `prisma/schema.prisma`
-3. **Add `@@index([userId, isPinned])`** to items model in Prisma schema
-4. **Extract `ICON_MAP`** to shared file `src/lib/constants/icons.ts`
-5. **Fix MobileSidebar** to use real database data instead of mock data
+Set up NextAuth v5 with Prisma adapter and GitHub OAuth. Use NextAuth's default pages for testing.
 
 ## Status
 
-Complete
+Not Started
 
 ## Goals
 
-- Improve code quality with minimal risk
-- Ensure mobile and desktop sidebars show consistent data
-- Prepare database schema for better query performance
+- Install NextAuth v5 (`next-auth@beta`) and `@auth/prisma-adapter`
+- Set up split auth config pattern for edge compatibility
+- Add GitHub OAuth provider
+- Protect `/dashboard/*` routes using Next.js 16 proxy
+- Redirect unauthenticated users to sign-in
 
 ## Notes
 
-- These are low-risk, high-impact fixes
-- No auth integration required
-- Index migration requires `npx prisma migrate dev`
+**Key Gotchas:**
+- Use `next-auth@beta` (not `@latest` which installs v4)
+- Proxy file must be at `src/proxy.ts` (same level as `app/`)
+- Use named export: `export const proxy = auth(...)` not default export
+- Use `session: { strategy: 'jwt' }` with split config pattern
+- Don't set custom `pages.signIn` - use NextAuth's default page
 
-## Todo
+**Files to Create:**
+1. `src/auth.config.ts` - Edge-compatible config (providers only, no adapter)
+2. `src/auth.ts` - Full config with Prisma adapter and JWT strategy
+3. `src/app/api/auth/[...nextauth]/route.ts` - Export handlers from auth.ts
+4. `src/proxy.ts` - Route protection with redirect logic
+5. `src/types/next-auth.d.ts` - Extend Session type with user.id
 
-### 1. Remove console.warn
-- File: `src/lib/db/collections.ts`
-- Remove or replace `console.warn('Demo user not found')` with silent return
+**Environment Variables:**
+```
+AUTH_SECRET=
+AUTH_GITHUB_ID=
+AUTH_GITHUB_SECRET=
+```
 
-### 2. Add Prisma datasource url
-- File: `prisma/schema.prisma`
-- Add `url = env("DATABASE_URL")` to datasource block
+**Testing:**
+1. Go to `/dashboard` - should redirect to sign-in
+2. Click "Sign in with GitHub"
+3. Verify redirect back to `/dashboard` after auth
 
-### 3. Add isPinned index (Migration Required)
-- File: `prisma/schema.prisma`
-- Add `@@index([userId, isPinned])` to Item model
-- **Development**: Run `npx prisma migrate dev --name add_isPinned_index`
-- **Production**: Run `npx prisma migrate deploy` after merging
-
-### Database Migration Workflow
-Since this feature includes a schema change, follow the migration workflow:
-1. Schema changes must NEVER use `prisma db push` - always use migrations
-2. **Development**: `npx prisma migrate dev --name <migration_name>` creates migration files locally
-3. **Production**: `npx prisma migrate deploy` applies pending migrations before app starts
-4. Verify migration status with `npx prisma migrate status` before committing
-5. Migration files must be committed to git and applied in order across environments
-
-### 4. Extract ICON_MAP to shared constants
-- File: `src/lib/constants/icons.ts` (new)
-- Move `ICON_MAP` from `sidebar.tsx` and `mobile-sidebar.tsx` to shared file
-- Export and import in both components
-
-### 5. Fix MobileSidebar to use sidebarData
-- File: `src/components/layout/mobile-sidebar.tsx`
-- Add `SidebarData` interface (already exists in dashboard-layout.tsx)
-- Accept `sidebarData` prop instead of importing mock data
-- File: `src/components/layout/dashboard-layout.tsx`
-- Pass `sidebarData` to `MobileSidebar` component
+**References:**
+- Edge compatibility: https://authjs.dev/getting-started/installation#edge-compatibility
+- Prisma adapter: https://authjs.dev/getting-started/adapters/prisma
 
 ## History
 - **Initial Setup** - Next.js 16, Tailwind CSS v4, TypeScript configured (Completed)
