@@ -3,15 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  Settings,
   PanelLeftClose,
   PanelLeft,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ICON_MAP } from "@/lib/constants/icons";
+import UserMenu from "@/components/layout/user-menu";
 
 interface CollectionItem {
   id: string;
@@ -24,7 +23,7 @@ interface CollectionItem {
 interface SidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
-  user: { name: string | null; email: string | null } | null;
+  user: { name: string | null; email: string | null; image: string | null } | null;
   itemTypes: {
     id: string;
     name: string;
@@ -230,30 +229,12 @@ export default function Sidebar({
 
       {/* User section at bottom */}
       <div className="border-t border-border p-4">
-        {isCollapsed ? (
-          <div className="flex justify-center">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary text-xs text-primary-foreground">
-                {user?.name?.split(" ").map((n) => n[0]).join("") ?? "DU"}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary text-xs text-primary-foreground">
-                {user?.name?.split(" ").map((n) => n[0]).join("") ?? "DU"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium">{user?.name ?? "Demo User"}</p>
-              <p className="truncate text-xs text-muted-foreground">{user?.email ?? "demo@devstash.io"}</p>
-            </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+        <UserMenu
+          name={user?.name ?? null}
+          email={user?.email ?? null}
+          image={user?.image ?? null}
+          collapsed={isCollapsed}
+        />
       </div>
     </aside>
   );

@@ -1,32 +1,19 @@
 import { prisma } from '@/lib/prisma';
 
-const DEMO_USER_EMAIL = 'demo@devstash.io';
+export async function getSidebarData(userId?: string) {
+  // Get user from session or fall back to demo user
+  let user = userId
+    ? await prisma.user.findUnique({ where: { id: userId } })
+    : null;
 
-export async function getStats() {
-  const demoUser = await prisma.user.findUnique({
-    where: { email: DEMO_USER_EMAIL },
-  });
-
-  if (!demoUser) {
-    return { totalItems: 0, totalCollections: 0, favoriteItems: 0, favoriteCollections: 0 };
+  // Fall back to demo user if no session user found
+  if (!user) {
+    user = await prisma.user.findUnique({
+      where: { email: 'demo@devstash.io' },
+    });
   }
 
-  const [totalItems, totalCollections, favoriteItems, favoriteCollections] = await Promise.all([
-    prisma.item.count({ where: { userId: demoUser.id } }),
-    prisma.collection.count({ where: { userId: demoUser.id } }),
-    prisma.item.count({ where: { userId: demoUser.id, isFavorite: true } }),
-    prisma.collection.count({ where: { userId: demoUser.id, isFavorite: true } }),
-  ]);
-
-  return { totalItems, totalCollections, favoriteItems, favoriteCollections };
-}
-
-export async function getSidebarData() {
-  const demoUser = await prisma.user.findUnique({
-    where: { email: DEMO_USER_EMAIL },
-  });
-
-  if (!demoUser) {
+  if (!user) {
     return {
       user: null,
       itemTypes: [],
@@ -46,7 +33,7 @@ export async function getSidebarData() {
 
   // Get collections with item counts and dominant types
   const collections = await prisma.collection.findMany({
-    where: { userId: demoUser.id },
+    where: { userId: user.id },
     include: {
       _count: { select: { items: true } },
       items: {
@@ -77,10 +64,35 @@ export async function getSidebarData() {
   const recentCollections = enrichedCollections.slice(0, 3);
 
   return {
-    user: { name: demoUser.name, email: demoUser.email },
+    user: { name: user.name, email: user.email, image: user.image },
     itemTypes,
     favoriteCollections,
     recentCollections,
     allCollections: enrichedCollections,
   };
+}
+
+export async function getStats(userId?: string) {
+  let user = userId
+    ? await prisma.user.findUnique({ where: { id: userId } })
+    : null;
+
+  if (!user) {
+    user = await prisma.user.findUnique({
+      where: { email: 'demo@devstash.io' },
+    });
+  }
+
+  if (!user) {
+    return { totalItems: 0, totalCollections: 0, favoriteItems: 0, favoriteCollections: 0 };
+  }
+
+  const [totalItems, totalCollections, favoriteItems, favoriteCollections] = await Promise.all([
+    prisma.item.count({ where: { userId: user.id } }),
+    prisma.collection.count({ where: { userId: user.id } }),
+    prisma.item.count({ where: { userId: user.id, isFavorite: true } }),
+    prisma.collection.count({ where: { userId: user.id, isFavorite: true } }),
+  ]);
+
+  return { totalItems, totalCollections, favoriteItems, favoriteCollections };
 }

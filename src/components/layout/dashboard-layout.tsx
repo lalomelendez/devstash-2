@@ -6,7 +6,7 @@ import Sidebar from "@/components/layout/sidebar";
 import MobileSidebar from "@/components/layout/mobile-sidebar";
 
 interface SidebarData {
-  user: { name: string | null; email: string | null } | null;
+  user: { name: string | null; email: string | null; image: string | null } | null;
   itemTypes: {
     id: string;
     name: string;

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { auth } from "@/auth";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import StatsCards from "@/components/dashboard/stats-cards";
 import StatsCardsSkeleton from "@/components/dashboard/stats-cards-skeleton";
@@ -11,7 +12,8 @@ import RecentItemsSkeleton from "@/components/dashboard/recent-items-skeleton";
 import { getSidebarData } from "@/lib/db/stats";
 
 export default async function DashboardPage() {
-  const sidebarData = await getSidebarData();
+  const session = await auth();
+  const sidebarData = await getSidebarData(session?.user?.id);
 
   return (
     <DashboardLayout sidebarData={sidebarData}>

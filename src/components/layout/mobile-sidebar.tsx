@@ -2,23 +2,18 @@
 
 import Link from "next/link";
 import {
-  Star,
-  Settings,
-} from "lucide-react";
-import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ICON_MAP } from "@/lib/constants/icons";
+import UserMenu from "@/components/layout/user-menu";
 
 interface SidebarData {
-  user: { name: string | null; email: string | null } | null;
+  user: { name: string | null; email: string | null; image: string | null } | null;
   itemTypes: {
     id: string;
     name: string;
@@ -161,25 +156,11 @@ export default function MobileSidebar({ isOpen, onClose, sidebarData }: MobileSi
 
           {/* User section at bottom */}
           <div className="border-t border-border p-4">
-            <div className="flex items-center gap-3">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary text-xs text-primary-foreground">
-                  {user?.name
-                    ?.split(" ")
-                    .map((n) => n[0])
-                    .join("") ?? "DU"}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 overflow-hidden">
-                <p className="truncate text-sm font-medium">{user?.name ?? "Demo User"}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {user?.email ?? "demo@devstash.io"}
-                </p>
-              </div>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Settings className="h-4 w-4" />
-              </Button>
-            </div>
+            <UserMenu
+              name={user?.name ?? null}
+              email={user?.email ?? null}
+              image={user?.image ?? null}
+            />
           </div>
         </div>
       </SheetContent>
