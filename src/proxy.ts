@@ -11,7 +11,7 @@ export const proxy = async function (request: Request) {
   const url = new URL(request.url);
 
   if (url.pathname.startsWith('/dashboard') && !isLoggedIn) {
-    return NextResponse.redirect(new URL('/api/auth/signin', request.url));
+    return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
   return NextResponse.next();
