@@ -1,44 +1,10 @@
 # Current Feature
 
-## Overview
-
-Add Credentials provider for email/password authentication with registration.
-
 ## Status
-
-Not Started
 
 ## Goals
 
-- Use bcryptjs for hashing (already installed)
-- Add password field to User model via migration if not already there
-- Update `auth.config.ts` with Credentials provider placeholder
-- Update `auth.ts` to override Credentials with bcrypt validation
-- Create registration API route at `/api/auth/register`
-
 ## Notes
-
-**Key Requirements:**
-- Registration API route: `POST /api/auth/register`
-- Accept: name, email, password, confirmPassword
-- Validate passwords match
-- Check if user already exists
-- Hash password with bcryptjs
-- Create user in database
-
-**Credentials Provider in Split Pattern:**
-- `auth.config.ts`: Add Credentials provider with `authorize: () => null` placeholder
-- `auth.ts`: Override the Credentials provider with actual bcrypt validation logic
-
-**Testing:**
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test","email":"test@test.com","password":"password123","confirmPassword":"password123"}'
-```
-
-**References:**
-- Credentials provider: https://authjs.dev/getting-started/authentication/credentials
 
 ## History
 - **Initial Setup** - Next.js 16, Tailwind CSS v4, TypeScript configured (Completed)
@@ -54,3 +20,5 @@ curl -X POST http://localhost:3000/api/auth/register \
 - Added a pro badge to the files and images type in the sidebar
 - **Quick Fixes - Code Quality Improvements** - Removed console.warn, added DB indexes for isPinned/isFavorite/updatedAt, extracted ICON_MAP to shared constants, fixed MobileSidebar to use sidebarData prop, added Suspense boundaries with skeleton loading states. (Completed)
 - **Auth Phase 1 (NextAuth v5)** - Created NextAuth v5 beta config with GitHub OAuth, proxy middleware for /dashboard protection, JWT session strategy. Blocked by Auth.js v5 beta bug where GitHub OAuth callback fails with "unexpected iss issuer" validation error - Auth.js v5 incorrectly treats GitHub as OIDC provider. (Blocked - Awaiting alternative auth solution)
+- **Auth Phase 2 (Credentials)** - Added CredentialsProvider with bcrypt password validation, jwt/session callbacks for user.id propagation, created /api/auth/register route. Email/password authentication now working. GitHub OAuth still blocked by Auth.js v5 iss bug. (Completed)
+- **Auth Phase 3 (Auth UI)** - Created custom sign-in (`/sign-in`) and register (`/register`) pages with form validation and error display. GitHub OAuth button included but still blocked by iss bug. Created UserMenu component with click-outside dropdown for sidebar/mobile sidebar bottom section with avatar (image or initials fallback), name, profile link, and sign out. Dashboard now uses auth() session for real user data. (Completed)
